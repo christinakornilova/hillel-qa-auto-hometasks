@@ -1,4 +1,4 @@
-package random.number;
+package class02;
 
 import utils.Utils;
 
