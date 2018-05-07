@@ -1,6 +1,5 @@
-package hometas01;
+package hometask01;
 
-import hometask01.Candies;
 import org.junit.Assert;
 import org.junit.Test;
 
