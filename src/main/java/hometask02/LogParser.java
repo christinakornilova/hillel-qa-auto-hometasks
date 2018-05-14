@@ -1,10 +1,7 @@
 package hometask02;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class LogParser {
 
@@ -58,6 +55,19 @@ public class LogParser {
         return result;
     }
 
+    public static List<String> fileContentToList(String[] fileContent, ArrayList<String[]> arrayOfFilesContentsList) {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < arrayOfFilesContentsList.size(); i++){ //System.out.println(fileContent[i]);
+            fileContent = arrayOfFilesContentsList.get(i);
+            for(int j = 0; j < fileContent.length-1; j++)
+//                if (fileContent[j].contains(date)) {
+                    result.add(fileContent[j]);
+//                    System.out.println(fileContent[j]);
+//                } //else System.out.println("No such pattern");
+        }
+        return result;
+    }
+
     private static File writeListToFile(List<String> result, File destination) {
         try (BufferedWriter bw = new BufferedWriter (new FileWriter (destination))) {
             for (String line : result) {
@@ -85,7 +95,7 @@ public class LogParser {
 
 
     public static void main(String[] args) {
-        String date = "Feb  1";
+//        String date = "Feb  1";
         FileInputStream fileInputStream = null;
         String[] fileContent = new String[]{};
         ArrayList<String[]> arrayOfFilesContentsList = new ArrayList<>();
@@ -120,9 +130,13 @@ public class LogParser {
 //            Collections.sort(result);
 
 
-            List<String> result = filterByDate(fileContent, arrayOfFilesContentsList, date);
+//            List<String> result = filterByDate(fileContent, arrayOfFilesContentsList, date);
+//            List<String> result = fileContentToList(fileContent, arrayOfFilesContentsList);
+
+            List<String> result = fileContentToList(fileContent, arrayOfFilesContentsList);
             List<LogData> logDataList = new ArrayList<>();
             List<LogData> sfLogDataList = new ArrayList<>();
+//            List<LogData> sfLogDataList = new LinkedList<>();
             List<LogData> sfGroupLogDataList = new ArrayList<>();
 
             String s;
@@ -140,7 +154,13 @@ public class LogParser {
                 if(logDataList.get(i).getInfo().contains("Captured transactions:")) {
                     try{
                         ld = new LogData(logDataList.get(i+1).getDateTime(), logDataList.get(i+1).getInfo());
-                        if(!ld.getInfo().contains("Log time:") && !ld.getInfo().contains("Asset id:")) {
+                        if(!ld.getInfo().contains("Log time:") && !ld.getInfo().contains("Asset id:") && !ld.getInfo().contains("transactions:") && !ld.getInfo().contains("Warning:")) {
+//                            s = ld.getInfo();
+//                            int y = s.indexOf("transaction");
+                            if (ld.getInfo().indexOf("transaction") != -1)
+                                ld.setInfo((ld.getInfo().substring(ld.getInfo().indexOf("transaction"))).substring(14));
+//                            s = s.substring(14);
+//                            ld.setInfo(s);
                             sfLogDataList.add(ld);
                         } //else {
 //                            ld = new LogData(logDataList.get(i+2).getDateTime(), logDataList.get(i+2).getInfo());
@@ -155,14 +175,27 @@ public class LogParser {
             }
 
 
+//            List<LogData> sfLogDataList2 = new ArrayList<>();
+//            for (LogData ldata:sfLogDataList
+//                 ) {
+//                s = ldata.getInfo();
+//                int y = s.indexOf("transaction");
+//                if (y != -1) s = s.substring(y);
+//                s = s.substring(14);
+//                ldata.setInfo(s);
+//                sfLogDataList2.add(ldata);
+//            }
+            s = "";
 
-            for (int i = 0; i < sfLogDataList.size() - 1; i++) {
-                if(sfLogDataList.get(i).getDateTime() == sfLogDataList.get(i+1).getDateTime()) {
-                    ld = new LogData(sfLogDataList.get(i).getDateTime(),
-                            sfLogDataList.get(i).getDateTime() + "," + sfLogDataList.get(i+1).getDateTime());
-                    sfGroupLogDataList.add(ld);
+            for (int i = 0; i < sfLogDataList.size() - 2; i++) {
+                while (sfLogDataList.get(i).getDateTime().equals(sfLogDataList.get(i+1).getDateTime())) {
+                    s = sfLogDataList.get(i).getInfo() + "," + sfLogDataList.get(i+1).getInfo();
+                    i +=1 ;
                 }
+                sfGroupLogDataList.add(new LogData(sfLogDataList.get(i).getDateTime(), s));
             }
+
+
 
 //            sfGroupLogDataList.stream().forEach(System.out::println);
 //            writeToFile(sfGroupLogDataList, destination);
@@ -171,9 +204,9 @@ public class LogParser {
 
 
 
-            writeToFile(sfLogDataList, destination);
+//            writeToFile(sfLogDataList, destination);
 
-//            writeListToFile(result, destination);
+            writeToFile(sfGroupLogDataList, destination);
 
         } catch (Exception e) {
             e.printStackTrace();
