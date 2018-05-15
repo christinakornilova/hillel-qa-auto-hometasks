@@ -1,0 +1,6 @@
+Feb  4 01:00:20 gw3-ir-metrobank transaction0: Log time: Sun, 04 Feb 2018 01:00:10 GMT
+Feb  4 01:00:20 gw3-ir-metrobank transaction0: Asset id: 5901
+Feb  4 01:00:20 gw3-ir-metrobank transaction0: Warning: some captured transaction don't have ID, please add ID to all the transactions in the mappings file!
+Feb  4 01:00:20 gw3-ir-metrobank transaction0: Captured transactions:
+Feb  4 01:00:20 gw3-ir-metrobank transaction0:  Metro-1,Metro-11,Metro-12,Metro-13,Metro-15,Metro-2,Metro-28,Metro-29,Metro-3,Metro-30,Metro-33,Metro-4,Metro-5,Metro-8,Metro-9
+Feb  4 01:00:20 gw3-ir-metrobank transaction0:  Metro-10,Metro-11,Metro-12,Metro-14,Metro-15

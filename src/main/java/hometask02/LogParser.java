@@ -13,48 +13,66 @@ public class LogParser {
 
     private static Logger log = LogManager.getLogger(LogParser.class);
 
-    //using files list get each file content to array of String
-    public static String[] getFileContentToArray(FileInputStream fileInputStream) throws IOException, FileNotFoundException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+    public static String[] getFileContentToArray(FileInputStream fileInputStream) {
+        Scanner in = null;
+        try{
+            in = new Scanner(fileInputStream);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         List<String> lines = new ArrayList<>();
-        String line = bufferedReader.readLine();
+        String line;
 
-        while(line != null){
-            line = bufferedReader.readLine();
+        while(in.hasNext()) {
+            line = in.nextLine();
             lines.add(line);
         }
-        bufferedReader.close();
         return lines.toArray(new String[]{});
     }
 
-    public static List<String> writeAllFilesContentToArrayList() {
+    public static ArrayList<File> getListOfFiles(String directoryName) {
+        File directory = new File(directoryName);
+        File[] fList = directory.listFiles();
+        ArrayList<File> files = new ArrayList<>();
+        for (File file : fList) {
+            if (file.isFile()) {
+                files.add(file);
+            } else if (file.isDirectory()) {
+                getListOfFiles(file.getAbsolutePath());
+            }
+        }
+        return files;
+    }
+
+    public static List<String> writeAllFilesContentToArrayList(String path) {
         String[] fileContent;
         ArrayList<String[]> arrayOfFilesContentsList = new ArrayList<>();
         FileInputStream fileInputStream = null;
         try {
-            File[] filesList = new File(logFilesPath).listFiles();
-            for (int i = 0; i < filesList.length; i++) {
-                log.debug(filesList[i]);
-                fileInputStream = new FileInputStream(filesList[i]);
+            ArrayList<File> filesList = getListOfFiles(path);
+            for (int i = 0; i < filesList.size(); i++) {
+                log.debug(filesList.get(i));
+                fileInputStream = new FileInputStream(filesList.get(i));
                 log.debug("Total file size to read (in bytes) : "  + fileInputStream.available());
                 fileContent = getFileContentToArray(fileInputStream);
                 arrayOfFilesContentsList.add(fileContent);
             }
+
         } catch (Exception e) {
-            log.error("Unable to read log files. ", e.getStackTrace().toString());
+            log.error("Unable to read log files. ", e);
         } finally {
             try {
                 if (fileInputStream != null)
                     fileInputStream.close();
             } catch (Exception e) {
-                log.error("File input stream close exception. ", e.getMessage());
+                log.error("File input stream close exception. ", e);
             }
         }
 
         List<String> result = new ArrayList<>();
         for (int i = 0; i < arrayOfFilesContentsList.size(); i++) {
             fileContent = arrayOfFilesContentsList.get(i);
-            for(int j = 0; j < fileContent.length-1; j++)
+            for(int j = 0; j < fileContent.length; j++)
                     result.add(fileContent[j]);
         }
         return result;
@@ -77,11 +95,15 @@ public class LogParser {
         Collections.sort(logDataList, LogData.dateTimeComparator);
         for (int i = 0; i < logDataList.size(); i++) {
             if(logDataList.get(i).getInfo().contains("Captured transactions:")) {
-                ld = new LogData(logDataList.get(i+1).getDateTime(), logDataList.get(i+1).getInfo());
-                if(!ld.getInfo().contains("Log time:") && !ld.getInfo().contains("Asset id:") && !ld.getInfo().contains("transactions:") && !ld.getInfo().contains("Warning:")) {
-                    if (ld.getInfo().indexOf("transaction") != -1)
-                        ld.setInfo((ld.getInfo().substring(ld.getInfo().indexOf("transaction"))).substring(14));
-                    sfLogDataList.add(ld);
+                while (i+1 < logDataList.size() && !logDataList.get(i+1).getInfo().contains("Captured transactions:")) {
+                    ld = new LogData(logDataList.get(i+1).getDateTime(), logDataList.get(i+1).getInfo());
+                    if (!ld.getInfo().contains("Log time:") && !ld.getInfo().contains("Asset id:") && !ld.getInfo().contains("transactions:") && !ld.getInfo().contains("Warning:")) {
+                        if (ld.getInfo().indexOf("transaction") != -1) {
+                            ld.setInfo((ld.getInfo().substring(ld.getInfo().indexOf("transaction"))).substring(14));
+                        }
+                        sfLogDataList.add(ld);
+                    }
+                    i+=1;
                 }
             }
         }
@@ -92,8 +114,8 @@ public class LogParser {
         String s = "";
         List<LogData> sfGroupLogDataList = new ArrayList<>();
 
-        for (int i = 0; i < sfLogDataList.size() - 2; i++) {
-            while (sfLogDataList.get(i).getDateTime().equals(sfLogDataList.get(i+1).getDateTime())) {
+        for (int i = 0; i < sfLogDataList.size(); i++) {
+            while (i+1 < sfLogDataList.size() && sfLogDataList.get(i).getDateTime().equals(sfLogDataList.get(i+1).getDateTime())) {
                 s = sfLogDataList.get(i).getInfo() + "," + (sfLogDataList.get(i+1).getInfo()).trim();
                 i += 1 ;
             }
@@ -109,16 +131,16 @@ public class LogParser {
             }
             bw.close ();
         } catch (IOException e) {
-            log.error("Unable to write file. ", e.getStackTrace());
+            log.error("Unable to write file. ", e);
         }
         log.info("General file reated successfully.");
         return destination;
     }
 
     public static void main(String[] args) {
-        File destination = new File("target/logsSort/file.log");
+        File destination = new File("target/file.log");
         try {
-            List<String> result = writeAllFilesContentToArrayList();
+            List<String> result = writeAllFilesContentToArrayList(logFilesPath);
             log.info("All files were read.");
             List<LogData> logDataList = removeUnnecessaryInfo(result);
             logDataList = sortAndFilterListData(logDataList);
@@ -127,7 +149,7 @@ public class LogParser {
             writeToFile(logDataList, destination);
             log.info("Same time transactions were grouped by time, and successfully stored to: " + destination.getPath());
         } catch (Exception e) {
-            log.error("Unable to process and/or write file. ", e.getStackTrace());
+            log.error("Unable to process and/or write file. ", e);
         }
     }
 }
