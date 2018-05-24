@@ -1,4 +1,4 @@
-package regexp;
+package class04;
 
 public class Regexp {
 

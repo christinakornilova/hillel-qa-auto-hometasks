@@ -1,6 +1,5 @@
 package utils;
 
-import hometask03.LogParameters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -78,7 +77,7 @@ public class Utils {
         try{
             in = new Scanner(fileInputStream);
         }catch(Exception e){
-            e.printStackTrace();
+            log.error("Unable to read line.", e);
         }
         List<String> lines = new ArrayList<>();
         String line;
@@ -88,6 +87,23 @@ public class Utils {
             lines.add(line);
         }
         return lines.toArray(new String[]{});
+    }
+
+    public static List<String> addSingleFileContentToList(FileInputStream fileInputStream) {
+        Scanner in = null;
+        try{
+            in = new Scanner(fileInputStream);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        List<String> lines = new ArrayList<>();
+        String line;
+
+        while(in.hasNext()) {
+            line = in.nextLine();
+            lines.add(line);
+        }
+        return lines;
     }
 
     public static List<String> writeAllFilesContentToArrayList(String path) {
