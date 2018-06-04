@@ -7,8 +7,12 @@ public class EmailLineSingleProvider {
 //    private final static String rgx = "^((.+)@gmail\\.com(\\s*,\\s*|\\s*$))*$";
     private final static String rgx = "^(\\w+([-+.']\\w+)*@gmail\\.com(\\s*,\\s*|\\s*$))*$";
 
+    public static boolean isGmailOnly(String s) {
+        return s.matches(rgx);
+    }
+
     public static void main(String[] args) {
-        System.out.println("eList string matches regexp (expected: true) : " + eList1.matches(rgx));
-        System.out.println("eList2 string matches regexp (expected: false) : " + eList2.matches(rgx));
+        System.out.println("eList string matches regexp (expected: true) : " + isGmailOnly(eList1));
+        System.out.println("eList2 string matches regexp (expected: false) : " + isGmailOnly(eList2));
     }
 }
