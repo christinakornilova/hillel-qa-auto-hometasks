@@ -1,10 +1,11 @@
 package jira_tests;
 
 import jira.*;
-import org.junit.After;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import utils.UIUtils;
 import utils.WebDriverUtils;
@@ -28,6 +29,7 @@ public class JiraSanityTests {
     private static final String issueSummary = "QA-Auto-Test-Issue-Summary-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     private static final String errorMessageText = "Sorry, your username and password are incorrect - please try again.";
 
+    @BeforeMethod
     public static void prepare() {
         driver = WebDriverUtils.getDriver(WebDriverUtils.Browser.CHROME);
         driver.get(baseURL);
@@ -36,7 +38,6 @@ public class JiraSanityTests {
 
     @Test(description = "Valid login")
     public static void testLogin() {
-        prepare();
         UserDashboardPage dashboard = mainPage.login(login, password);
         Assert.assertEquals(dashboard.getUserName(), login);
         LogoutPage logoutPage = dashboard.logout();
@@ -45,7 +46,6 @@ public class JiraSanityTests {
 
     @Test(description = "Create and Open created issue")
     public static void testCreateAndOpenIssue() throws InterruptedException {
-        prepare();
         //login, check that user logged in successfully
         UserDashboardPage dashboard = mainPage.login(login, password);
         Assert.assertEquals(dashboard.getUserName(), login);
@@ -72,14 +72,13 @@ public class JiraSanityTests {
 
     @Test(description = "Invalid login")
     public static void testUnsuccessfullLogin() {
-        prepare();
         mainPage.invalidLogin(wrongLogin, wrongPassword);
         Assert.assertTrue(mainPage.isErrorMessageDisplayed());
         Assert.assertEquals(errorMessageText, mainPage.getErrorMessageText());
     }
 
 
-    @After
+    @AfterClass
     public static void tearDown() {
         driver.quit();
     }
