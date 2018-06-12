@@ -46,6 +46,7 @@ public class IssuesReportedByMePage extends UserPage {
     }
 
     public IssuePage openLastCreatedIssue() {
+        UIUtils.waitUntilElementAppears(lastCreatedIssuePath, driver);
         lastCreatedIssuePath.click();
         return new IssuePage(driver);
     }
