@@ -45,4 +45,5 @@ public class BasePage {
         }
         throw new IllegalStateException("Unable to get error message. The error message is not displayed");
     }
+
 }

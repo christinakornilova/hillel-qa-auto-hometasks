@@ -1,6 +1,5 @@
 package jira;
 
-import jira.basic.BasePage;
 import jira.basic.UserPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,6 +17,7 @@ public class IssuesReportedByMePage extends UserPage {
     private static final String searchResultsListCss = "div[class='search-results']";
     private static final String issuesListXpath = "//ol[@class='issue-list']/li";
     private static final String lastCreatedIssuePageLinkCss = "a[id='key-val']";
+    private static final String issueSuccessPopupCss = "//div[class='aui-message aui-message-success success closeable shadowed aui-will-close']";
 
 //    @FindBy(css = headerCss)
 //    WebElement header;
@@ -33,6 +33,9 @@ public class IssuesReportedByMePage extends UserPage {
 
     @FindBy(css = lastCreatedIssuePageLinkCss)
     WebElement lastCreatedIssuePath;
+
+    @FindBy(css = issueSuccessPopupCss)
+    WebElement issueSuccessPopup;
 
 
     public IssuesReportedByMePage(WebDriver driver) {
@@ -50,4 +53,5 @@ public class IssuesReportedByMePage extends UserPage {
         lastCreatedIssuePath.click();
         return new IssuePage(driver);
     }
+
 }

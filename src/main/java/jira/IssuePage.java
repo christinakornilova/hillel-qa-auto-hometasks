@@ -83,49 +83,40 @@ public class IssuePage extends UserPage {
             robot.keyRelease(KeyEvent.VK_DOWN);
             robot.keyPress(KeyEvent.VK_DOWN);
             robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            UIUtils.waitForSeconds(5);
+            UIUtils.waitForSeconds(3);
 
-            //in opened Save as dialog clear filename field
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            UIUtils.waitForSeconds(1);
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            robot.keyPress(KeyEvent.VK_A);
-            UIUtils.waitForSeconds(1);
-            robot.keyRelease(KeyEvent.VK_A);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            UIUtils.waitForSeconds(1);
-            robot.keyPress(KeyEvent.VK_DELETE);
-            UIUtils.waitForSeconds(1);
-            robot.keyRelease(KeyEvent.VK_DELETE);
-            UIUtils.waitForSeconds(5);
-
-            //paste need file name with location
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            robot.keyPress(KeyEvent.VK_V);
-            UIUtils.waitForSeconds(1);
-            robot.keyRelease(KeyEvent.VK_V);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
+            //press Tab
+            robot.keyPress(KeyEvent.VK_TAB);
+            robot.keyRelease(KeyEvent.VK_TAB);
+            UIUtils.waitForSeconds(2);
 
             //press Enter
             robot.keyPress(KeyEvent.VK_ENTER);
             robot.keyRelease(KeyEvent.VK_ENTER);
-            UIUtils.waitForSeconds(5);
+            UIUtils.waitForSeconds(3);
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            UIUtils.waitForSeconds(3);
+
 
         } catch(Exception e) {
             log.error("Error saving attachment ", e);
         }
     }
 
+    public void download(String attachmentLink) {
+        driver.get(attachmentLink);
+    }
+
     public String getAttachmentLink() {
         return issueAttachmentLink.getAttribute("href");
     }
 
-    public boolean isOpened(WebDriver driver) {
+    public boolean isAttachmentAdded() {
+        return UIUtils.isElementPresent(By.cssSelector(issueAttachmentLinkCss), driver);
+    }
+
+    public static boolean isOpened(WebDriver driver) {
         return UIUtils.isDialogOpened(driver, issueSummaryValCss);
     }
 }

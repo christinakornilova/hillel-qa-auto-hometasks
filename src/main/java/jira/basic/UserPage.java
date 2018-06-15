@@ -2,6 +2,7 @@ package jira.basic;
 
 import jira.LogoutPage;
 import jira.UserDashboardPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -38,5 +39,13 @@ public class UserPage extends BasePage {
         logOutLink.click();
         UIUtils.waitUntilTitleIs(LogoutPage.getLogoutPageTitle(), driver);
         return new LogoutPage(driver);
+    }
+
+    public boolean isUserLoggedIn() {
+        return driver.findElements(By.cssSelector(userFullnameCss)).size() == 1;
+    }
+
+    public static boolean isOpened(WebDriver driver) {
+        return UIUtils.isElementPresent(By.cssSelector(logoCss), driver) && UIUtils.isElementPresent(By.cssSelector(logOutCss), driver);
     }
 }

@@ -44,19 +44,15 @@ public class UserDashboardPage extends UserPage {
         UIUtils.waitUntilElementAppears(By.cssSelector(activityStreamCss), driver);
     }
 
-    public boolean isOpened(WebDriver driver) {
+    public static boolean isOpened(WebDriver driver) {
         return UIUtils.isElementPresent(By.cssSelector(activityStreamCss), driver);
-    }
-
-    public boolean isUserLoggedIn() {
-        return driver.findElements(By.cssSelector(userFullnameCss)).size() == 1;
     }
 
     public String getUserName() {
         return userFullname.getAttribute("data-username");
     }
 
-    public CreateIssueDialog clickCreateButton() {
+    public CreateIssueDialog createIssue() {
         createButton.click();
         return new CreateIssueDialog(driver);
     }

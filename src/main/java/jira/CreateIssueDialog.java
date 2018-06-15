@@ -86,13 +86,10 @@ public class CreateIssueDialog extends BasePage {
     public UserDashboardPage createIssue(String project, String issueType, String summary) {
         UIUtils.waitUntilElementToBeInteractable(projectDropdown, driver);
         setProjectType(project);
-//        UIUtils.waitForSeconds(3);
         UIUtils.waitUntilElementToBeInteractable(issueTypeDropdown, driver);
         setIssueType(issueType);
-//        UIUtils.waitForSeconds(3);
         UIUtils.waitUntilElementToBeInteractable(issueSummaryField, driver);
         setSummary(summary);
-//        UIUtils.waitForSeconds(3);
         UIUtils.waitUntilElementToBeInteractable(assignToMeLink, driver);
         assignIssueToMe();
         submit();

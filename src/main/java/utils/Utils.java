@@ -4,6 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -169,8 +174,26 @@ public class Utils {
         return destination;
     }
 
+    public static byte[] getMD5(String input) {
+        // https://stackoverflow.com/questions/304268/getting-a-files-md5-checksum-in-java
+        MessageDigest md;
+        byte[] digest = null;
+        try {
+            InputStream in = Files.newInputStream(Paths.get(input));
+            md = MessageDigest.getInstance("MD5");
+            DigestInputStream dis = new DigestInputStream(in, md);
+            while (dis.read() != -1) ;
+            dis.close();
+            digest = md.digest();
+        }
+        catch (IOException e) {
+            log.error("Unable to process file: " + e);
+        }
+        catch (NoSuchAlgorithmException ex) {
+            log.error("Could not find MD5 alg " + ex);
+        }
 
-
-
+        return digest;
+    }
 
 }

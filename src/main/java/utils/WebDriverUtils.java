@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class WebDriverUtils {
@@ -35,21 +36,19 @@ public class WebDriverUtils {
 
                 //Set file 'save to' directory (for download attachment Jira test)
                 Map<String, Object> chromePreferences = new Hashtable<>();
-                chromePreferences.put("download.default_directory", System.getProperty("user.dir") + "/target");
-                //Below two chrome preference settings will disable popup dialog when download file (for download attachment Jira test)
-                chromePreferences.put("profile.default_content_settings.popups", 0);
+
+                chromePreferences.put("download.default_directory", JiraConstants.attachmentSaveToPath);
+                //Below chrome preference settings will disable popup dialog when download file (for download attachment Jira test)
                 chromePreferences.put("download.prompt_for_download", "false");
-                chromePreferences.put("download.directory_upgrade", true);
+                chromePreferences.put("profile.default_content_settings.popups", 0);
+                chromePreferences.put("download.directory_upgrade", "true");
+                chromePreferences.put("safebrowsing.enabled", "true");
 
                 chromeOptions.setExperimentalOption("prefs", chromePreferences);
-                chromeOptions.addArguments("--test-type");
-//                chromeOptions.setAcceptInsecureCerts(true);
-
-//                DesiredCapabilities cap = DesiredCapabilities.chrome();
-//                cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-//                cap.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+                chromeOptions.addArguments("--test-type", "--start-maximized", "--incognito");
 
                 driver = new ChromeDriver(chromeOptions);
+                driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
                 break;
             default:
                 break;

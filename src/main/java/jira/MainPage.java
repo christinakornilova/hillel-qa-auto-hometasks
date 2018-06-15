@@ -44,17 +44,19 @@ public class MainPage extends HeaderPage {
         loginButton.click();
     }
 
-    public UserDashboardPage login(String login, String password) {
+    private void login(String login, String password) {
         setUserLogin(login);
         setUserPassword(password);
         clickLoginButton();
+    }
+
+    public UserDashboardPage loginSuccessfully(String username, String password) {
+        login(username, password);
         return new UserDashboardPage(driver);
     }
 
-    public MainPage invalidLogin(String invalidLogin, String invalidPassword) {
-        setUserLogin(invalidLogin);
-        setUserPassword(invalidPassword);
-        clickLoginButton();
+    public MainPage loginFail(String username, String invalidPassword) {
+        login(username, invalidPassword);
         UIUtils.waitUntilElementAppears(By.xpath(errorMessageXpath), driver);
         return new MainPage(driver);
     }
