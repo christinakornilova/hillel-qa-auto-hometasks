@@ -1,8 +1,7 @@
-package jira;
+package jira.pages;
 
-import jira.basic.UserPage;
+import jira.base.UserPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -10,7 +9,6 @@ import org.openqa.selenium.support.FindBy;
 import utils.UIUtils;
 
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 
@@ -77,26 +75,30 @@ public class IssuePage extends UserPage {
 
             //call context menu and select 'Save link as'
             action.contextClick(issueAttachmentLink).build().perform();
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
+            for(int i = 0; i < 3; i++) {
+                robot.keyPress(KeyEvent.VK_DOWN);
+                robot.keyRelease(KeyEvent.VK_DOWN);
+            }
+//            robot.keyPress(KeyEvent.VK_DOWN);
+//            robot.keyRelease(KeyEvent.VK_DOWN);
+//            robot.keyPress(KeyEvent.VK_DOWN);
+//            robot.keyRelease(KeyEvent.VK_DOWN);
             UIUtils.waitForSeconds(3);
 
-            //press Tab
+            //press Tab in 'Save As' dialog
             robot.keyPress(KeyEvent.VK_TAB);
             robot.keyRelease(KeyEvent.VK_TAB);
             UIUtils.waitForSeconds(2);
 
-            //press Enter
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            UIUtils.waitForSeconds(3);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            UIUtils.waitForSeconds(3);
+            //press Enter in 'Save As' dialog
+            for(int i = 0; i < 2; i++) {
+                robot.keyPress(KeyEvent.VK_ENTER);
+                robot.keyRelease(KeyEvent.VK_ENTER);
+                UIUtils.waitForSeconds(3);
+            }
+//            robot.keyPress(KeyEvent.VK_ENTER);
+//            robot.keyRelease(KeyEvent.VK_ENTER);
+//            UIUtils.waitForSeconds(3);
 
 
         } catch(Exception e) {

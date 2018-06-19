@@ -1,11 +1,14 @@
-package jira;
+package jira.pages;
 
-import jira.basic.UserPage;
+import jira.dialogs.CreateIssueDialog;
+import jira.base.UserPage;
+import jira.pages.login.AdministratorAccessLoginPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import utils.UIUtils;
+import utils.Utils;
 
 
 public class UserDashboardPage extends UserPage {
@@ -19,6 +22,9 @@ public class UserDashboardPage extends UserPage {
 
     private static final String activityStreamCss = "div[class='dashboard-item-header']";
 
+    private static final String jiraAdministrationDropdownCss = "a[id='admin_menu']";
+    private static final String userManagementItemCss = "a[id='admin_users_menu']";
+
 
 
     @FindBy(css = dashboardDropdownCss)
@@ -27,15 +33,20 @@ public class UserDashboardPage extends UserPage {
     @FindBy(css = issuesDropdownCss)
     WebElement issuesDropdown;
 
-    @FindBy (css = issuesReportedByMeItemCss)
+    @FindBy(css = issuesReportedByMeItemCss)
     WebElement issuesReportedByMe;
 
     @FindBy(css = createButtonCss)
     WebElement createButton;
 
-
     @FindBy(css = activityStreamCss)
     WebElement activityStream;
+
+    @FindBy(css = jiraAdministrationDropdownCss)
+    WebElement administrationDropdown;
+
+    @FindBy(css = userManagementItemCss)
+    WebElement userManagement;
 
     public UserDashboardPage(WebDriver driver) {
         super(driver);
@@ -58,11 +69,21 @@ public class UserDashboardPage extends UserPage {
     }
 
     public IssuesReportedByMePage openIssuesReportedByCurrentUser() {
-        UIUtils.waitUntilElementAppears(issuesDropdown, driver);
-        issuesDropdown.click();
-        UIUtils.waitUntilElementAppears(issuesReportedByMe, driver);
-        issuesReportedByMe.click();
+//        UIUtils.waitUntilElementAppears(issuesDropdown, driver);
+//        issuesDropdown.click();
+//        UIUtils.waitUntilElementAppears(issuesReportedByMe, driver);
+//        issuesReportedByMe.click();
+        Utils.openPageUsingMenuDropdown(issuesDropdown, issuesReportedByMe, driver);
         return new IssuesReportedByMePage(driver);
+    }
+
+    public AdministratorAccessLoginPage openAdminLoginPage() {
+//        UIUtils.waitUntilElementAppears(administrationDropdown, driver);
+//        administrationDropdown.click();
+//        UIUtils.waitUntilElementAppears(userManagement, driver);
+//        userManagement.click();
+        Utils.openPageUsingMenuDropdown(administrationDropdown, userManagement, driver);
+        return new AdministratorAccessLoginPage(driver);
     }
 
 

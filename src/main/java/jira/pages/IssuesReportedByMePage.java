@@ -1,6 +1,7 @@
-package jira;
+package jira.pages;
 
-import jira.basic.UserPage;
+import jira.base.UserPage;
+import jira.pages.IssuePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

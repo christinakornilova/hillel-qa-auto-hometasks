@@ -1,7 +1,7 @@
-package jira.basic;
+package jira.base;
 
-import jira.LogoutPage;
-import jira.UserDashboardPage;
+import jira.pages.LogoutPage;
+import jira.pages.UserDashboardPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

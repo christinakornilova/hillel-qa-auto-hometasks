@@ -38,6 +38,7 @@ public class WebDriverUtils {
                 Map<String, Object> chromePreferences = new Hashtable<>();
 
                 chromePreferences.put("download.default_directory", JiraConstants.attachmentSaveToPath);
+
                 //Below chrome preference settings will disable popup dialog when download file (for download attachment Jira test)
                 chromePreferences.put("download.prompt_for_download", "false");
                 chromePreferences.put("profile.default_content_settings.popups", 0);

@@ -1,4 +1,4 @@
-package jira.basic;
+package jira.base;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

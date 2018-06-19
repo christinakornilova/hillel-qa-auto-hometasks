@@ -1,7 +1,10 @@
 package jira_tests;
 
-import jira.*;
-import jira.basic.UserPage;
+import jira.base.UserPage;
+import jira.dialogs.CreateIssueDialog;
+import jira.dialogs.DeleteUserDialog;
+import jira.pages.*;
+import jira.pages.login.AdministratorAccessLoginPage;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -27,10 +30,8 @@ public class JiraTests {
     private static final String issueType = "Ошибка"  + Keys.ENTER;
     private static final String issueSummary = "QA-Auto-Test-Issue-Summary-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     private static final String errorMessageText = "Sorry, your username and password are incorrect - please try again.";
+    private static final String emptySearchResultText = "No users were found to match your search";
 
-    private static final String attachmentFilePath = "/src/test/resources/testlog/test_log.txt";
-    private static final String attachmentFileName = "test_log.txt";
-    private static final String attachmentSaveToPath = "/Users/Christina/Downloads/";
 
 
     private UserDashboardPage login(String login, String password) {
@@ -99,7 +100,7 @@ public class JiraTests {
     @Test(description = "Add attachment to issue", priority = 3)
     public void testAddAttachment() {
         //get absolute path to file
-        String filePath = System.getProperty("user.dir") + attachmentFilePath;
+        String filePath = System.getProperty("user.dir") + JiraConstants.attachmentFilePath;
 
         //login
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
@@ -111,7 +112,7 @@ public class JiraTests {
         //add attachment
         issuePage = issuePage.addAttachment(filePath);
         //check that attachment added successfully
-        Assert.assertTrue(issuePage.getAttachmentLink().contains(attachmentFileName));
+        Assert.assertTrue(issuePage.getAttachmentLink().contains(JiraConstants.attachmentFileName));
     }
 
     @Test(description = "Download attachment", priority = 4)
@@ -124,17 +125,43 @@ public class JiraTests {
         Assert.assertTrue(issuePage.isAttachmentAdded());
         //get attachment link, check the it is correct
         String attachmentLink = issuePage.getAttachmentLink();
-        Assert.assertTrue(attachmentLink.contains(attachmentFileName));
+        Assert.assertTrue(attachmentLink.contains(JiraConstants.attachmentFileName));
 
         //try to download attachment
-        issuePage.downloadAttachment(attachmentSaveToPath + attachmentFileName);
+        issuePage.downloadAttachment(JiraConstants.attachmentSaveToPath + JiraConstants.attachmentFileName);
 
         //check that file download successfully
-        Assert.assertEquals(Utils.getMD5(attachmentSaveToPath + attachmentFileName),
-                Utils.getMD5(System.getProperty("user.dir") + attachmentFilePath),
+        Assert.assertEquals(JiraConstants.md5Expected,
+                Utils.getMD5(JiraConstants.attachmentSaveToPath + JiraConstants.attachmentFileName),
                 "MD5 of two files are not equal.");
 
     }
+
+    @Test(description = "Admin. Create user", priority = 5)
+    public void testCreateUser() {
+        //login as admin user
+        UserDashboardPage dashboard = login(JiraConstants.adminLogin, JiraConstants.adminPassword);
+        //open User management page via menu
+        AdministratorAccessLoginPage adminLoginPage = dashboard.openAdminLoginPage();
+        UserManagementPage userManagementPage = adminLoginPage.confirmAdminPassword(JiraConstants.adminPassword);
+        //create new user
+        CreateNewUserPage newUserPage = userManagementPage.createUser();
+        userManagementPage = newUserPage.createUser(JiraConstants.newUserEmail, JiraConstants.newUserFullName, JiraConstants.newUserUsername,
+                JiraConstants.newUserPassword);
+        Assert.assertEquals(JiraConstants.newUserFullName + " has been successfully created", userManagementPage.getUserCreateSuccessPopupText());
+
+        //search for new user
+        userManagementPage.searchForUser(JiraConstants.newUserFullName);
+        Assert.assertEquals(JiraConstants.newUserUsername, userManagementPage.getUsernameById(0));
+
+        //delete newly created user
+        DeleteUserDialog deleteUserDialog = userManagementPage.deleteUser(JiraConstants.newUserUsername);
+        userManagementPage = deleteUserDialog.confirm();
+
+        //check that user search result is empty now
+        Assert.assertEquals(emptySearchResultText, userManagementPage.getEmptySearchResultText());
+    }
+
 
     @AfterMethod
     public static void tearDown() {

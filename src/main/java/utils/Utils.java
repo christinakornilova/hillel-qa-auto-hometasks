@@ -2,6 +2,8 @@ package utils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -145,22 +147,6 @@ public class Utils {
         return result;
     }
 
-//    public static File writeLogParametersToFile(List<LogParameters> list, File destination) {
-//        try (BufferedWriter bw = new BufferedWriter (new FileWriter(destination))) {
-//            for (int i = 0; i < list.size(); i++) {
-//                bw.write (list.get(i).getTimestamp() + list.get(i).getActivity() + list.get(i).getLoginUsername()
-//                        + list.get(i).getDataObject() + list.get(i).getUserAction() + list.get(i).getUserActionStatus()
-//                        + list.get(i).getLabels() + list.get(i).getServiceType() + list.get(i).getMappingIds()
-//                        + list.get(i).getUri() + "\n");
-//            }
-//            bw.close ();
-//        } catch (IOException e) {
-//            log.error("Unable to write file. ", e);
-//        }
-//        log.info("General file reated successfully.");
-//        return destination;
-//    }
-
         public static File writeLogParametersToFile(List<String> list, File destination) {
         try (BufferedWriter bw = new BufferedWriter (new FileWriter(destination))) {
             for (int i = 0; i < list.size(); i++) {
@@ -194,6 +180,13 @@ public class Utils {
         }
 
         return digest;
+    }
+
+    public static void openPageUsingMenuDropdown(WebElement menuElement, WebElement menuItem, WebDriver driver) {
+        UIUtils.waitUntilElementAppears(menuElement, driver);
+        menuElement.click();
+        UIUtils.waitUntilElementAppears(menuItem, driver);
+        menuItem.click();
     }
 
 }

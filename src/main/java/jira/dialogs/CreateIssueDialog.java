@@ -1,6 +1,7 @@
-package jira;
+package jira.dialogs;
 
-import jira.basic.BasePage;
+import jira.base.BasePage;
+import jira.pages.UserDashboardPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -13,7 +14,6 @@ public class CreateIssueDialog extends BasePage {
     private static final String issueTypeDropdownCss = "input[id='issuetype-field']";
     private static final String summaryCss = "input[id='summary']";
     private static final String assignToMeLinkCss = "a[id='assign-to-me-trigger']";
-//    private static final String descriptionCss = "";
     private static final String submitCreateIssueCss = "input[id='create-issue-submit']";
     private static final String cancelCreateIssueCss = "a[class='cancel']";
 
@@ -33,9 +33,6 @@ public class CreateIssueDialog extends BasePage {
 
     @FindBy(css = assignToMeLinkCss)
     WebElement assignToMeLink;
-
-//    @FindBy(css = descriptionCss)
-//    WebElement issueDescriptionField;
 
     @FindBy(css = submitCreateIssueCss)
     WebElement createIssueButton;
@@ -66,15 +63,13 @@ public class CreateIssueDialog extends BasePage {
         UIUtils.clearAndFill(issueSummaryField, summary);
     }
 
-//    public void setDescription(String description) {
-//        UIUtils.clearAndFill(issueDescriptionField, description);
-//    }
-
     public void assignIssueToMe() {
+        UIUtils.waitUntilElementToBeInteractable(assignToMeLink, driver);
         assignToMeLink.click();
     }
 
     public void submit() {
+        UIUtils.waitUntilElementToBeInteractable(createIssueButton, driver);
         createIssueButton.click();
     }
 

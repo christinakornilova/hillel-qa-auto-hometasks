@@ -1,12 +1,12 @@
-package jira;
+package jira.pages;
 
-import jira.basic.HeaderPage;
+import jira.base.BasePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import utils.UIUtils;
 
-public class LogoutPage extends HeaderPage {
+public class LogoutPage extends BasePage {
     private static final String logoutPageTitle = "Logout - Hillel IT School JIRA";
     private static final String loginAgainLinkCss = "a[href='/login.jsp']";
 
