@@ -150,7 +150,7 @@ public class JiraTests {
                 JiraConstants.newUserPassword);
         Assert.assertEquals(JiraConstants.newUserFullName + " has been successfully created", userManagementPage.getUserCreateSuccessPopupText());
 
-        //search for new user
+        //check that user created: search for new user
         userManagementPage.searchForUser(JiraConstants.newUserFullName);
         Assert.assertEquals(JiraConstants.newUserUsername, userManagementPage.getUsernameById(0));
 
@@ -158,7 +158,7 @@ public class JiraTests {
         DeleteUserDialog deleteUserDialog = userManagementPage.deleteUser(JiraConstants.newUserUsername);
         userManagementPage = deleteUserDialog.confirm();
 
-        //check that user search result is empty now
+        //check that user deleted successfully: search result is empty now
         Assert.assertEquals(emptySearchResultText, userManagementPage.getEmptySearchResultText());
     }
 
