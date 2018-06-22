@@ -17,4 +17,9 @@ public class JiraConstants {
     public static final String newUserFullName = "AUTOTEST JiraUser";
     public static final String newUserUsername = "testjuser18";
     public static final String newUserPassword = "123hillel";
+
+    //testrail
+    public static String testrailUsername = "rvalek@intersog.com";
+    public static String testrailPassword = "hillel";
+    public static String testrailUrl = "https://hillelmanold.testrail.io/";
 }

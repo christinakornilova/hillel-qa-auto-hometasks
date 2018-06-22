@@ -10,6 +10,8 @@ import org.openqa.selenium.support.FindBy;
 import utils.UIUtils;
 import utils.Utils;
 
+import java.util.List;
+
 
 public class UserDashboardPage extends UserPage {
 
@@ -19,6 +21,7 @@ public class UserDashboardPage extends UserPage {
     private static final String issuesReportedByMeItemCss = "a[id='filter_lnk_reported_lnk']";
 
     private static final String createButtonCss = "a[id='create_link']";
+    private static final String newIssuesLinkCss = "a.issue-created-key";
 
     private static final String activityStreamCss = "div[class='dashboard-item-header']";
 
@@ -26,6 +29,8 @@ public class UserDashboardPage extends UserPage {
     private static final String userManagementItemCss = "a[id='admin_users_menu']";
 
 
+    @FindBy(css = newIssuesLinkCss)
+    List<WebElement> newIssuesLink;
 
     @FindBy(css = dashboardDropdownCss)
     WebElement dashboardDropdown;
@@ -69,21 +74,22 @@ public class UserDashboardPage extends UserPage {
     }
 
     public IssuesReportedByMePage openIssuesReportedByCurrentUser() {
-//        UIUtils.waitUntilElementAppears(issuesDropdown, driver);
-//        issuesDropdown.click();
-//        UIUtils.waitUntilElementAppears(issuesReportedByMe, driver);
-//        issuesReportedByMe.click();
         Utils.openPageUsingMenuDropdown(issuesDropdown, issuesReportedByMe, driver);
         return new IssuesReportedByMePage(driver);
     }
 
     public AdministratorAccessLoginPage openAdminLoginPage() {
-//        UIUtils.waitUntilElementAppears(administrationDropdown, driver);
-//        administrationDropdown.click();
-//        UIUtils.waitUntilElementAppears(userManagement, driver);
-//        userManagement.click();
         Utils.openPageUsingMenuDropdown(administrationDropdown, userManagement, driver);
         return new AdministratorAccessLoginPage(driver);
+    }
+
+    public String getNewIssueLink() {
+        return newIssuesLink.get(0).getAttribute("href");
+    }
+
+    public IssuePage openIssue(String newIssueUrl) {
+        driver.get(newIssueUrl);
+        return new IssuePage(driver);
     }
 
 
