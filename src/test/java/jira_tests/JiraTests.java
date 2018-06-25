@@ -1,25 +1,28 @@
 package jira_tests;
 
+import jira.base.UserPage;
 import jira.dialogs.CreateIssueDialog;
 import jira.dialogs.DeleteUserDialog;
-import jira.testrail.TestRail;
 import jira.pages.*;
 import jira.pages.login.AdministratorAccessLoginPage;
+import jira_tests.listeners.TestListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.ITestResult;
 import org.testng.annotations.*;
 import utils.JiraConstants;
 import utils.Utils;
+import utils.WebDriverUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Listeners(TestListener.class)
 
-public class JiraTests extends JiraWebTestBase {
-//    private static WebDriver driver;
-//    private static MainPage mainPage;
-//    private static Logger log;
+
+public class JiraTests {
 
     private static final String project = "General QA Robert (GQR)" + Keys.ENTER;
     private static final String projectVal = "/browse/GQR";
@@ -27,9 +30,11 @@ public class JiraTests extends JiraWebTestBase {
     private static final String issueSummary = "QA-Auto-Test-Issue-Summary-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     private static final String errorMessageText = "Sorry, your username and password are incorrect - please try again.";
     private static final String emptySearchResultText = "No users were found to match your search";
-
     private static String newIssueUrl = "";
 
+    public static WebDriver driver;
+    public static MainPage mainPage;
+    public static Logger log;
 
 
     private UserDashboardPage login(String login, String password) {
@@ -43,32 +48,28 @@ public class JiraTests extends JiraWebTestBase {
         IssuePage lastCreatedIssuePage = reportedByMePage.openLastCreatedIssue();
         return lastCreatedIssuePage;
     }
-    @BeforeClass(alwaysRun = true)
-    public void initPages() {
-        UserDashboardPage dashboard;
-        System.out.println("Jira Pages Initialized");
+
+    @BeforeMethod(alwaysRun = true)
+    public void setUp() {
+        log = LogManager.getLogger(JiraTests.class);
+        driver = WebDriverUtils.getDriver(WebDriverUtils.Browser.CHROME);
+        driver.get(JiraConstants.baseURL);
+        mainPage = new MainPage(driver);
     }
 
-    @BeforeMethod
-    public void prepare() {
-//        driver = WebDriverUtils.getDriver(WebDriverUtils.Browser.CHROME);
-//        driver.get(JiraConstants.baseURL);
-//        mainPage = new MainPage(driver);
-    }
-
-    @Test(description = "1. Invalid login", priority = -1)
+    @Test(description = "30. Invalid login", priority = -1)
     public  void testUnsuccessfulLogin() {
-        mainPage.loginFail(JiraConstants.wrongLogin, JiraConstants.wrongPassword);
+        mainPage.loginFail("invalidlogin", JiraConstants.wrongPassword);
         Assert.assertTrue(mainPage.isErrorMessageDisplayed());
         Assert.assertEquals(errorMessageText, mainPage.getErrorMessageText());
     }
 
-    @Test(description = "2. Valid login")
+    @Test(description = "31. Valid login")
     public void testLogin() {
         login(JiraConstants.login, JiraConstants.password);
     }
 
-    @Test(description = "3. Create issue", dependsOnMethods = { "testLogin" })
+    @Test(description = "32. Create issue", dependsOnMethods = { "testLogin" })
     public void testCreateIssue() {
         //login, check that user logged in successfully
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
@@ -80,12 +81,9 @@ public class JiraTests extends JiraWebTestBase {
         //fill * fields, create issue
         createIssueDialog.createIssue(project, issueType, issueSummary);
         Assert.assertFalse(createIssueDialog.isOpened(driver), "Create issue dialog is still opened.");
-//        newIssueUrl = dashboard.getNewIssueLink();
-//        UIUtils.waitUntilPopupWindowIsClosed(driver);
-//        Assert.assertTrue(dashboard.isOpened(driver), "User dashboard was not displayed after user created an issue.");
     }
 
-    @Test(description = "4. Open issue", dependsOnMethods = { "testCreateIssue" })
+    @Test(description = "33. Open issue", dependsOnMethods = { "testCreateIssue" })
     public void testOpenIssue() {
         //open created issue
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
@@ -96,7 +94,7 @@ public class JiraTests extends JiraWebTestBase {
         Assert.assertEquals(issueSummary, lastCreatedIssuePage.getIssueSummary());
     }
 
-    @Test(description = "5. Add attachment to issue", dependsOnMethods = { "testOpenIssue" })
+    @Test(description = "34. Add attachment", dependsOnMethods = { "testOpenIssue" })
     public void testAddAttachment() {
         //get absolute path to file
         String filePath = System.getProperty("user.dir") + JiraConstants.attachmentFilePath;
@@ -114,7 +112,7 @@ public class JiraTests extends JiraWebTestBase {
         Assert.assertTrue(issuePage.getAttachmentLink().contains(JiraConstants.attachmentFileName));
     }
 
-    @Test(description = "6. Download attachment", dependsOnMethods = { "testAddAttachment" })
+    @Test(description = "35. Download attachment", dependsOnMethods = { "testAddAttachment" })
     public void testDownloadAttachment() {
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
 
@@ -136,7 +134,7 @@ public class JiraTests extends JiraWebTestBase {
 
     }
 
-    @Test(description = "7. Admin. Create user", dependsOnMethods = { "testLogin" })
+    @Test(description = "36. Create user", dependsOnMethods = { "testLogin" })
     public void testCreateUser() {
         //login as admin user
         UserDashboardPage dashboard = login(JiraConstants.adminLogin, JiraConstants.adminPassword);
@@ -161,26 +159,13 @@ public class JiraTests extends JiraWebTestBase {
         Assert.assertEquals(emptySearchResultText, userManagementPage.getEmptySearchResultText());
     }
 
-
     @AfterMethod
-    public static void tearDown(ITestResult result) throws Exception {
-        String[] caseIds=result.getMethod().getConstructorOrMethod().getMethod().getAnnotation(Test.class).testName().split(",");
-        TestRail apiCall=new TestRail();
-        if (ITestResult.FAILURE == result.getStatus()) {
-            String resultName = result.getName();
-            apiCall.setCaseResult(caseIds, testrailRun,true);
-
+    public void tearDown() {
+        if(UserPage.isOpened(driver)) {
+            UserPage userPage = new UserPage(driver);
+            LogoutPage logoutPage = userPage.logout();
+            Assert.assertTrue(logoutPage.isOpened(), "User not logged out successfully.");
         }
-        else
-            apiCall.setCaseResult(caseIds, testrailRun,false);
-
-
-//        if(UserPage.isOpened(driver)) {
-//            UserPage userPage = new UserPage(driver);
-//            LogoutPage logoutPage = userPage.logout();
-//            Assert.assertTrue(logoutPage.isOpened(), "User not logged out successfully.");
-//        }
-//        driver.quit();
-
+        driver.quit();
     }
 }

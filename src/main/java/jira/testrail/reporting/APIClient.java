@@ -9,7 +9,7 @@
  * Copyright Gurock Software GmbH. See license.md for details.
  */
  
-package jira.testrail;
+package jira.testrail.reporting;
 
 import java.net.URL;
 import java.net.HttpURLConnection;

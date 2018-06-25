@@ -11,7 +11,9 @@ import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -187,6 +189,10 @@ public class Utils {
         menuElement.click();
         UIUtils.waitUntilElementAppears(menuItem, driver);
         menuItem.click();
+    }
+
+    public static String getTimestamp() {
+        return new SimpleDateFormat("yy/MM/dd HH:mm").format(new Date());
     }
 
 }
