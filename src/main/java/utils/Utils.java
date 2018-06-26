@@ -1,5 +1,6 @@
 package utils;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
@@ -193,6 +194,10 @@ public class Utils {
 
     public static String getTimestamp() {
         return new SimpleDateFormat("yy/MM/dd HH:mm").format(new Date());
+    }
+
+    public static String decodeString(String encodedString) {
+        return new String(Base64.decodeBase64(encodedString.getBytes()));
     }
 
 }

@@ -33,7 +33,7 @@ public class TestListener implements ITestListener {
         String projectId = "6";
         String runPrefix = "Jira";
         String username = JiraConstants.testrailUsername;
-        String password = JiraConstants.testrailPassword;
+        String password = Utils.decodeString(JiraConstants.testrailEncPassword);
 
         if (baseURL.isEmpty() || projectId.isEmpty()) {
             log.info("TestRail reporting is not configured.");

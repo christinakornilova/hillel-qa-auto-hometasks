@@ -25,12 +25,10 @@ import java.util.Date;
 public class JiraTests {
 
     private static final String project = "General QA Robert (GQR)" + Keys.ENTER;
-    private static final String projectVal = "/browse/GQR";
     private static final String issueType = "Ошибка"  + Keys.ENTER;
     private static final String issueSummary = "QA-Auto-Test-Issue-Summary-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     private static final String errorMessageText = "Sorry, your username and password are incorrect - please try again.";
     private static final String emptySearchResultText = "No users were found to match your search";
-    private static String newIssueUrl = "";
 
     public static WebDriver driver;
     public static MainPage mainPage;
@@ -59,7 +57,7 @@ public class JiraTests {
 
     @Test(description = "30. Invalid login", priority = -1)
     public  void testUnsuccessfulLogin() {
-        mainPage.loginFail("invalidlogin", JiraConstants.wrongPassword);
+        mainPage.loginFail(JiraConstants.wrongLogin, JiraConstants.wrongPassword);
         Assert.assertTrue(mainPage.isErrorMessageDisplayed());
         Assert.assertEquals(errorMessageText, mainPage.getErrorMessageText());
     }
@@ -87,9 +85,12 @@ public class JiraTests {
     public void testOpenIssue() {
         //open created issue
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
+
+        //switch to reported by me page for current user
         IssuesReportedByMePage reportedByMePage = dashboard.openIssuesReportedByCurrentUser();
         Assert.assertEquals(issueSummary, reportedByMePage.getLatestIssueTitle());
-//        IssuePage lastCreatedIssuePage = dashboard.openIssue(newIssueUrl);
+
+        //select last created issue and open it, verify summary
         IssuePage lastCreatedIssuePage = reportedByMePage.openLastCreatedIssue();
         Assert.assertEquals(issueSummary, lastCreatedIssuePage.getIssueSummary());
     }
@@ -108,6 +109,7 @@ public class JiraTests {
 
         //add attachment
         issuePage = issuePage.addAttachment(filePath);
+
         //check that attachment added successfully
         Assert.assertTrue(issuePage.getAttachmentLink().contains(JiraConstants.attachmentFileName));
     }
@@ -136,11 +138,12 @@ public class JiraTests {
 
     @Test(description = "36. Create user", dependsOnMethods = { "testLogin" })
     public void testCreateUser() {
+        String jiraAdminPwd = Utils.decodeString(JiraConstants.adminEncPassword);
         //login as admin user
-        UserDashboardPage dashboard = login(JiraConstants.adminLogin, JiraConstants.adminPassword);
+        UserDashboardPage dashboard = login(JiraConstants.adminLogin, jiraAdminPwd);
         //open User management page via menu
         AdministratorAccessLoginPage adminLoginPage = dashboard.openAdminLoginPage();
-        UserManagementPage userManagementPage = adminLoginPage.confirmAdminPassword(JiraConstants.adminPassword);
+        UserManagementPage userManagementPage = adminLoginPage.confirmAdminPassword(jiraAdminPwd);
         //create new user
         CreateNewUserPage newUserPage = userManagementPage.createUser();
         userManagementPage = newUserPage.createUser(JiraConstants.newUserEmail, JiraConstants.newUserFullName, JiraConstants.newUserUsername,
@@ -148,11 +151,11 @@ public class JiraTests {
         Assert.assertEquals(JiraConstants.newUserFullName + " has been successfully created", userManagementPage.getUserCreateSuccessPopupText());
 
         //check that user created: search for new user
-        userManagementPage.searchForUser(JiraConstants.newUserFullName);
+        userManagementPage.searchForUser(JiraConstants.newUserEmail);
         Assert.assertEquals(JiraConstants.newUserUsername, userManagementPage.getUsernameById(0));
 
         //delete newly created user
-        DeleteUserDialog deleteUserDialog = userManagementPage.deleteUser(JiraConstants.newUserUsername);
+        DeleteUserDialog deleteUserDialog = userManagementPage.deleteUser(JiraConstants.newUserEmail);
         userManagementPage = deleteUserDialog.confirm();
 
         //check that user deleted successfully: search result is empty now

@@ -46,7 +46,6 @@ public class IssuePage extends UserPage {
 
 
     public String getIssueSummary() {
-        System.out.println(issueSummary.getText());
         return issueSummary.getText();
     }
 
@@ -79,11 +78,7 @@ public class IssuePage extends UserPage {
                 robot.keyPress(KeyEvent.VK_DOWN);
                 robot.keyRelease(KeyEvent.VK_DOWN);
             }
-//            robot.keyPress(KeyEvent.VK_DOWN);
-//            robot.keyRelease(KeyEvent.VK_DOWN);
-//            robot.keyPress(KeyEvent.VK_DOWN);
-//            robot.keyRelease(KeyEvent.VK_DOWN);
-            UIUtils.waitForSeconds(3);
+            UIUtils.waitForSeconds(2);
 
             //press Tab in 'Save As' dialog
             robot.keyPress(KeyEvent.VK_TAB);
@@ -96,10 +91,6 @@ public class IssuePage extends UserPage {
                 robot.keyRelease(KeyEvent.VK_ENTER);
                 UIUtils.waitForSeconds(3);
             }
-//            robot.keyPress(KeyEvent.VK_ENTER);
-//            robot.keyRelease(KeyEvent.VK_ENTER);
-//            UIUtils.waitForSeconds(3);
-
 
         } catch(Exception e) {
             log.error("Error saving attachment ", e);
