@@ -1,10 +1,8 @@
 package api_tests;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-public class APITests extends APITestBase {
+public class APITests {
     /*
     1. Во всех запросах Content-Type: application/json
 2. Получение списка пользователя было реализовано по GET на хост

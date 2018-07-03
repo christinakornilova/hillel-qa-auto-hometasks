@@ -19,7 +19,7 @@ public class ApiMethods {
     public static List<User> getUsersList() {
         Response response = baseHttpMethod.sendGet(path);
         return Arrays.asList(response.getBody().as(User[].class));
-//        for (Users user: usersList) {
+//        for (User user: usersList) {
 //            System.out.println(user.getId() + " " + user.getName());
 //        }
     }
