@@ -1,14 +1,41 @@
 package api.entities;
 
 public class User {
-    int id;
+    String id;
     String name;
     String phone;
     String role;
     String strikes;
     String location;
 
-    public void setId(int id) {
+    public User() {
+    }
+
+    public User(String id, String name, String phone, String role, String location) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.role = role;
+        this.location = location;
+    }
+
+    public User(String id, String name, String phone, String role) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.role = role;
+    }
+
+    public User(String id, String name, String phone, String role, String strikes, String location) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.role = role;
+        this.strikes = strikes;
+        this.location = location;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -32,8 +59,7 @@ public class User {
         this.location = location;
     }
 
-    public int getId() {
-
+    public String getId() {
         return id;
     }
 

@@ -13,10 +13,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Utils {
 
@@ -199,5 +196,4 @@ public class Utils {
     public static String decodeString(String encodedString) {
         return new String(Base64.decodeBase64(encodedString.getBytes()));
     }
-
 }
