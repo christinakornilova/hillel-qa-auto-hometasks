@@ -7,7 +7,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import utils.ApiConstants;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +29,30 @@ public class APITests {
 12. Если приходит некорректное поле role (смотри условие задания №4) - возвращать 401 ошибку
 13. Если происходит попытка модификации или удаления несуществующего id - сервер должен возвращать 404 ошибку
      */
+
+    private void assertUserParameters(int userId, boolean isUserExpected) {
+        assertUserParameters(userId, "", isUserExpected, false);
+    }
+
+    private void assertUserParameters(int userId, String expectedValue, boolean assertRole) {
+        assertUserParameters(userId, expectedValue, true, assertRole);
+    }
+
+    private void assertUserParameters(int userId, String expectedValue, boolean isUserExpected, boolean assertRole) {
+        ApiResponse getUsers = ApiMethods.sendGetUsers();
+        if (isUserExpected) {
+            Assert.assertTrue(getUsers.isUserPresent(userId));
+            if (assertRole)
+                Assert.assertEquals(getUsers.getUsersList().get(userId - 1).getRole(), expectedValue);
+        } else {
+            Assert.assertFalse(getUsers.isUserPresent(userId));
+        }
+    }
+
+    private void assertResponseParameters(ApiResponse response, int expectedStatusCode) {
+        Assert.assertEquals(response.getStatusCode(), expectedStatusCode);
+        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+    }
 
     @Test(priority = -2)
     public void checkServerInitState() {
@@ -72,29 +95,20 @@ public class APITests {
     }
 
     @Test(dependsOnMethods = "testGetUsersList")
-    public void testCreateRegularUser() throws URISyntaxException {
+    public void testCreateRegularUser() {
         String userJSON = ApiMethods.userStringToJson("4", "Neil Sanderson", "+380670000011", "Student");
         ApiResponse response = ApiMethods.createUser(userJSON);
-        //check that server resp with ok
-        Assert.assertEquals(response.getStatusCode(), 200);
-        //assert that json object contains 4 entries including newly created one
-        Assert.assertTrue(ApiMethods.sendGetUsers().isUserPresent(4));
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
-
+        assertResponseParameters(response, 200);
+        assertUserParameters(4, true);
     }
 
     @Test(dependsOnMethods = "testGetUsersList")
-    public void createInvalidUser() throws URISyntaxException {
+    public void createInvalidUser() {
         //Send wrong "role" value - server should return 401 error
         String userJSON = ApiMethods.userStringToJson("5", "Invalid User", "+380670000022", "InvalidRole");
         ApiResponse response = ApiMethods.createUser(userJSON);
-        //check that server resp with 401
-        Assert.assertEquals(response.getStatusCode(), 401);
-        //assert that server has no user with id 5
-        Assert.assertFalse(ApiMethods.sendGetUsers().isUserPresent(5));
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 401);
+        assertUserParameters(5, false);
     }
 
     @Test(dependsOnMethods = "testCreateRegularUser")
@@ -104,48 +118,44 @@ public class APITests {
         List<User> usersList = ApiMethods.sendGetUsers().getUsersList();
         int listSize = usersList.size();
         ApiResponse response = ApiMethods.updateUser(4, userJSON);
-        //check that server response with ok
-        Assert.assertEquals(response.getStatusCode(), 204);
+        assertResponseParameters(response, 204);
         //assert that server still returns 4 entities
         usersList = ApiMethods.sendGetUsers().getUsersList();
         Assert.assertEquals(usersList.size(), listSize);
         //Check that user's name updated properly
         Assert.assertEquals(usersList.get(3).getName(), "Neil Christopher Sanderson");
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
     }
 
-
     @Test(dependsOnMethods = "testCreateRegularUser")
-    public void testAddUserAdmin() throws URISyntaxException {
-        //role is required field for admin and support
+    public void testAddUserAdmin() {
         String userJSON = ApiMethods.userStringToJson("5", "Adam Gontier", "+380670000055", "Administrator");
         ApiResponse response = ApiMethods.createAdmin(userJSON);
-        Assert.assertEquals(response.getStatusCode(), 200);
-        Assert.assertTrue(ApiMethods.sendGetUsers().isUserPresent(5));
-        //check newly created user role
-        Assert.assertEquals(ApiMethods.sendGetUsers().getUsersList().get(4).getRole(), "Administrator");
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 200);
+        assertUserParameters(5, "Administrator", true);
     }
 
     @Test(dependsOnMethods = "testAddUserAdmin")
     public void testAddUserSupport() {
-        //role is required field for admin and support
         String userJSON = ApiMethods.userStringToJson("6", "Matt Walst", "+380670000077", "Support");
         ApiResponse response = ApiMethods.createUser(userJSON);
-        Assert.assertEquals(response.getStatusCode(), 200);
-        Assert.assertTrue(ApiMethods.sendGetUsers().isUserPresent(6));
-        //check newly created user role
-        Assert.assertEquals(ApiMethods.sendGetUsers().getUsersList().get(5).getRole(), "Support");
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 200);
+        assertUserParameters(6, "Support", true);
     }
 
     @Test(dependsOnMethods = {"testEditUser", "testAddUserAdmin"})
     public void testEditAdminUser() {
         //Edit admin user - GET to host + /refreshAdmins
+        ApiResponse res1 = ApiMethods.sendGetUsers();
+        int id = res1.getUserId("Adam Gontier");
+        Assert.assertTrue(id!=-1);
+        String userJSON = ApiMethods.userStringToJson(String.valueOf(id), "Adam Wade Gontier", "+380679998877", "Administrator");
+        ApiResponse response = ApiMethods.updateAdminUser(id, userJSON);
+        assertResponseParameters(response, 200);
 
+        //Check that admin's name and phone updated properly
+        List<User> usersList = ApiMethods.sendGetUsers().getUsersList();
+        Assert.assertEquals(usersList.get(id-1).getName(), "Adam Wade Gontier");
+        Assert.assertEquals(usersList.get(id-1).getPhone(), "+380679998877");
     }
 
     @Test (dependsOnMethods = {"testCreateRegularUser", "testAddUserAdmin"})
@@ -153,76 +163,55 @@ public class APITests {
         //role is not required field for student
         String userJSON = ApiMethods.userStringToJson("7", "Brad Walst", "+380670000088");
         ApiResponse response = ApiMethods.createUser(userJSON);
-        Assert.assertEquals(response.getStatusCode(), 200);
-        Assert.assertTrue(ApiMethods.sendGetUsers().isUserPresent(7));
-        //create student user with no role than check that role added automatically
-        Assert.assertEquals(ApiMethods.sendGetUsers().getUsersList().get(6).getRole(), "Student");
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 200);
+        assertUserParameters(7, "Student", true);
     }
 
     @Test(dependsOnMethods = {"testCreateRegularUser", "testEditUser"})
     public void testDeleteRegularUser() {
         //For user deletion: send DELETE to host with '/{$id} of deleted user
-        //deleteUser()
         ApiResponse response = ApiMethods.deleteUser(4);
-        //assert that server resp with ok
-        Assert.assertEquals(response.getStatusCode(), 204);
-        //assert that user deleted successfully
-        Assert.assertFalse(ApiMethods.sendGetUsers().isUserPresent(4));
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 204);
+        assertUserParameters(4,false);
     }
 
     @Test(dependsOnMethods = {"testCreateRegularUser", "testAddUserAdmin", "testDeleteRegularUser"})
     public void testDeleteAdminUser(){
         //For user deletion: send DELETE to host with '/{$id} of deleted user
-        //deleteUser()
         ApiResponse response = ApiMethods.deleteUser(7);
-        //assert that server resp with ok
-        Assert.assertEquals(response.getStatusCode(), 204);
-        //assert that user deleted successfully
-        Assert.assertFalse(ApiMethods.sendGetUsers().isUserPresent(7));
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 204);
+        assertUserParameters(7,false);
     }
 
     @Test(dependsOnMethods = {"testCreateRegularUser", "testDeleteRegularUser"})
     public void testDeleteUserInvalidId() {
         //Delete user with non-existent id - server returns 404 error
-        //Sent DELETE to host with nonexistent id
         ApiResponse response = ApiMethods.deleteUser(100);
         //assert that server responds with 404 error
-        Assert.assertEquals(response.getStatusCode(), 404);
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 404);
     }
 
     @Test(dependsOnMethods = "testEditUser")
     public void testEditNonExistentUser() {
-        //User edit via PUT to host + '/' + id (where id - id of edited user)
         //Edit user with non-existent id - server returns 404 error
         String userJSON = ApiMethods.userStringToJson("100", "Null Null", "Null");
         ApiResponse response = ApiMethods.updateUser(100, userJSON);
-        //check that server response with ok
-        Assert.assertEquals(response.getStatusCode(), 404);
-        //All calls Content-Type: application/json
-        Assert.assertEquals(response.getContentType(), ApiConstants.CONTENT_TYPE);
+        assertResponseParameters(response, 404);
     }
 
     @Test(dependsOnMethods = "testGetUsersList")
     public void testInvalidContentType() {
         //Passing incorrect Content-Type - return 401 error
-        //sent invalid content type
         ApiResponse response = ApiMethods.sendInvalidGetUsers("text/javascript");
         //check that server resp with 401
-        Assert.assertEquals(response.getStatusCode(), 401);
+        assertResponseParameters(response, 401);
     }
 
     @Test(dependsOnMethods = "testGetUsersList")
     public void testNoContentType() {
         //Passing empty Content-Type - return 401 error
-        //sent no content type
         ApiResponse response = ApiMethods.sendInvalidGetUsers("");
         //check that server resp with 401
-        Assert.assertEquals(response.getStatusCode(), 401);
+        assertResponseParameters(response, 401);
     }
 }
