@@ -95,7 +95,7 @@ public class JiraTests {
         Assert.assertEquals(issueSummary, lastCreatedIssuePage.getIssueSummary());
     }
 
-    @Test(description = "34. Add attachment", dependsOnMethods = { "testOpenIssue" }, groups = { "Sanity", "Issues" })
+    @Test(description = "34. Add attachment", dependsOnMethods = { "testOpenIssue" }, groups = { "Issues.Attachments" })
     public void testAddAttachment() {
         //get absolute path to file
         String filePath = System.getProperty("user.dir") + JiraConstants.attachmentFilePath;
@@ -114,7 +114,7 @@ public class JiraTests {
         Assert.assertTrue(issuePage.getAttachmentLink().contains(JiraConstants.attachmentFileName));
     }
 
-    @Test(description = "35. Download attachment", dependsOnMethods = { "testAddAttachment" }, groups = { "Sanity", "Issues" })
+    @Test(description = "35. Download attachment", dependsOnMethods = { "testAddAttachment" }, groups = { "Issues.Attachments" })
     public void testDownloadAttachment() {
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
 
