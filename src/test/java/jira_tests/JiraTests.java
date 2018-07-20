@@ -62,7 +62,7 @@ public class JiraTests {
         Assert.assertEquals(errorMessageText, mainPage.getErrorMessageText());
     }
 
-    @Test(description = "31. Valid login")
+    @Test(description = "31. Valid login", groups = { "Sanity" })
     public void testLogin() {
         login(JiraConstants.login, JiraConstants.password);
     }
@@ -81,7 +81,7 @@ public class JiraTests {
         Assert.assertFalse(createIssueDialog.isOpened(driver), "Create issue dialog is still opened.");
     }
 
-    @Test(description = "33. Open issue", dependsOnMethods = { "testCreateIssue" })
+    @Test(description = "33. Open issue", dependsOnMethods = { "testCreateIssue" }, groups = { "Sanity", "Issues" })
     public void testOpenIssue() {
         //open created issue
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
@@ -95,7 +95,7 @@ public class JiraTests {
         Assert.assertEquals(issueSummary, lastCreatedIssuePage.getIssueSummary());
     }
 
-    @Test(description = "34. Add attachment", dependsOnMethods = { "testOpenIssue" })
+    @Test(description = "34. Add attachment", dependsOnMethods = { "testOpenIssue" }, groups = { "Sanity", "Issues" })
     public void testAddAttachment() {
         //get absolute path to file
         String filePath = System.getProperty("user.dir") + JiraConstants.attachmentFilePath;
@@ -114,7 +114,7 @@ public class JiraTests {
         Assert.assertTrue(issuePage.getAttachmentLink().contains(JiraConstants.attachmentFileName));
     }
 
-    @Test(description = "35. Download attachment", dependsOnMethods = { "testAddAttachment" })
+    @Test(description = "35. Download attachment", dependsOnMethods = { "testAddAttachment" }, groups = { "Sanity", "Issues" })
     public void testDownloadAttachment() {
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
 
@@ -136,7 +136,7 @@ public class JiraTests {
 
     }
 
-    @Test(description = "36. Create user", dependsOnMethods = { "testLogin" })
+    @Test(description = "36. Create user", dependsOnMethods = { "testLogin" }, groups = { "Sanity", "Issues" })
     public void testCreateUser() {
         String jiraAdminPwd = Utils.decodeString(JiraConstants.adminEncPassword);
         //login as admin user
