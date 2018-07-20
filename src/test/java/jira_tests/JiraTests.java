@@ -67,7 +67,7 @@ public class JiraTests {
         login(JiraConstants.login, JiraConstants.password);
     }
 
-    @Test(description = "32. Create issue", dependsOnMethods = { "testLogin" })
+    @Test(description = "32. Create issue", dependsOnMethods = { "testLogin" }, groups = { "Sanity" })
     public void testCreateIssue() {
         //login, check that user logged in successfully
         UserDashboardPage dashboard = login(JiraConstants.login, JiraConstants.password);
@@ -136,7 +136,7 @@ public class JiraTests {
 
     }
 
-    @Test(description = "36. Create user", dependsOnMethods = { "testLogin" }, groups = { "Sanity", "Issues" })
+    @Test(description = "36. Create user", dependsOnMethods = { "testLogin" }, groups = { "Admin" })
     public void testCreateUser() {
         String jiraAdminPwd = Utils.decodeString(JiraConstants.adminEncPassword);
         //login as admin user
